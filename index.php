@@ -1,9 +1,10 @@
 <?php
 // Define o número de jogos, o número de elementos por jogo e o intervalo dos números
-$numGames = 10;          // Quantidade de jogos
+$numGames = 23;          // Quantidade de jogos
 $numElements = 15;      // Quantidade de números únicos por jogo
 $minValue = 1;          // Valor mínimo
 $maxValue = 25;         // Valor máximo
+$maxParticipation = 65;
 
 // Função para gerar um array de números únicos
 function generateUniqueNumbers($numElements, $minValue, $maxValue)
@@ -81,7 +82,7 @@ foreach ($games_strings as $string) {
 echo "<h2>Porcentagem de Participação | Inicial</h2>";
 asort($participation);
 foreach ($participation as $number => $percentage) {
-    echo "<div " . ($percentage >= 66 ? "style='color: red;'" : '') . ">Número: $number - " . number_format($percentage, 1) . "%</div>";
+    echo "<div " . ($percentage >= $maxParticipation ? "style='color: red;'" : '') . ">Número: $number - " . number_format($percentage, 1) . "%</div>";
 }
 
 // Refazer jogos | Ajustar a Participação dos números
@@ -94,8 +95,22 @@ for ($i = 0; $i < count($games); $i++) {
         $number = $game[$j];
         $alterado = false;
 
-        if ($participation[$number] >= 66) {
+        if ($participation[$number] >= $maxParticipation) {
 
+            // $maiorValor = max($participation);
+            // $key = array_search($maiorValor, $participation);
+
+            // arsort($participation);
+
+            // if (!in_array($key, $game)) {
+            //     $game = substituirValor($game, $number, $key);
+
+            //     $games[$i] = $game;
+            //     sort($games[$i]);
+            //     $alterado = true;
+            // }
+
+            
             for ($k = 0; $k < count($participation); $k++) {
 
                 $key = array_keys($participation)[$k];
@@ -116,6 +131,7 @@ for ($i = 0; $i < count($games); $i++) {
                     // break;
                 }
             }
+             
         }
 
         if($alterado){
@@ -139,7 +155,7 @@ asort($participation);
 // Exibir a porcentagem ajustada de participação
 echo "<h2>Porcentagem de Participação | Ajsutada</h2>";
 foreach ($participation as $number => $percentage) {
-    echo "<div " . ($percentage >= 66 ? "style='color: red;'" : '') . ">Número: $number - " . number_format($percentage, 1) . "%</div>";
+    echo "<div " . ($percentage >= $maxParticipation ? "style='color: red;'" : '') . ">Número: $number - " . number_format($percentage, 1) . "%</div>";
 }
 
 
