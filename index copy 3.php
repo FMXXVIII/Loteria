@@ -1,6 +1,6 @@
 <?php
 
-$numGames = 10;          // Quantidade de jogos
+$numGames = 3;          // Quantidade de jogos
 $numElements = 15;      // Quantidade de números únicos por jogo
 $minValue = 1;          // Valor mínimo
 $maxValue = 25;         // Valor máximo
@@ -33,7 +33,7 @@ while ($count < $numGames) {
     // Adicionar o jogo à lista de jogos
     $games[] = $game;
 }
-
+unset($game);
 
 sort($games);
 foreach ($games as $game) {
@@ -52,27 +52,29 @@ $before = $numberParticipation;
 $minParticipation = array_search(min($numberParticipation), $numberParticipation);
 $maxParticipation = array_search(max($numberParticipation), $numberParticipation);
 
-echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=<br>";
 $teste = 0;
-$newGames = array();
-
 while (
     ((($numberParticipation[$minParticipation] * 100) / $numGames) < $maximumPercentageParticipation
         &&
         (($numberParticipation[$maxParticipation] * 100) / $numGames) > $maximumPercentageParticipation)
     && $teste < 3
 ) {
-    
+    // var_dump([
     $teste++;
-    
-    foreach ($games as $keyGame => $game) {
+    //     (($numberParticipation[$minParticipation] * 100) / $numGames),
+    //     (($numberParticipation[$maxParticipation] * 100) / $numGames),
+    //     $maximumPercentageParticipation
+    // ]);
+    foreach ($games as $game) {
 
         if (
             (($numberParticipation[$minParticipation] * 100) / $numGames) < $maximumPercentageParticipation
             &&
             (($numberParticipation[$maxParticipation] * 100) / $numGames) > $maximumPercentageParticipation
         ) {
-            
+            // var_dump($numberParticipation);
+
+
             // Encontra a chave (índice) da primeira ocorrência de $maxParticipation no array $game
             $key = array_search($maxParticipation, $game);
 
@@ -80,69 +82,86 @@ while (
             // Se $maxParticipation foi encontrado, substitui pelo $minParticipation
             if ($key !== false && !in_array($key, $game)) {
                 $game[$key] = $minParticipation;
-                // var_dump("{$key} => {$minParticipation}");
+                var_dump("{$key} => {$minParticipation}");
             }
 
             $numberParticipation[$minParticipation]++;
             $numberParticipation[$maxParticipation]--;
-            
+
+
+            // var_dump([
+            //     (($numberParticipation[$minParticipation] * 100) / $numGames),
+            //     "ganhou: {$minParticipation}",
+            //     "perdeu: {$maxParticipation}",
+            //     $key
+            // ]);
         }
-        
+        // foreach ($game as $key => $number) {
+
+        //     if((($numberParticipation[$number] * 100) / $numGames) > $maximumPercentageParticipation){
+
+        //     }
+        //     var_dump($number);
+        // }
         $minParticipation = array_search(min($numberParticipation), $numberParticipation);
         $maxParticipation = array_search(max($numberParticipation), $numberParticipation);
-
-        
     }
-
-    $games[$keyGame] = $game;
 }
+
 
 // var_dump($numberParticipation);
 $after = $numberParticipation;
 
 
-echo "<div style='display: flex;'>";
-echo "
-<table>
-    <thead>
-        <tr>
-            <th>before</th>
-            <th>%</th>
-        </tr>
+// echo "<div style='display: flex;'>";
+// echo "
+// <table>
+//     <thead>
+//         <tr>
+//             <th>before</th>
+//             <th>%</th>
+//         </tr>
     
-    </thead>
-    <tbody>";
+//     </thead>
+//     <tbody>";
 
-foreach ($before as $key => $value) {
-    echo "<tr><td>{$key}</td><td>" . round((($value * 100) / $numGames), 2) . "</td></tr>";
-}
+// foreach ($before as $key => $value) {
+//     echo "<tr><td>{$key}</td><td>" . round((($value * 100) / $numGames), 2) . "</td></tr>";
+// }
 
-echo "
-    </tbody>
-</table>";
+// echo "
+//     </tbody>
+// </table>";
 
 
-echo "
-<table style='margin-left: 30px;'>
-    <thead>
-        <tr>
-            <th>before</th>
-            <th>%</th>
-        </tr>
+// echo "
+// <table style='margin-left: 30px;'>
+//     <thead>
+//         <tr>
+//             <th>before</th>
+//             <th>%</th>
+//         </tr>
     
-    </thead>
-    <tbody>";
+//     </thead>
+//     <tbody>";
 
-foreach ($after as $key => $value) {
-    echo "<tr><td>{$key}</td><td>" . round((($value * 100) / $numGames), 2) . "</td></tr>";
-}
+// foreach ($after as $key => $value) {
+//     echo "<tr><td>{$key}</td><td>" . round((($value * 100) / $numGames), 2) . "</td></tr>";
+// }
 
-echo "
-    </tbody>
-</table>
+// echo "
+//     </tbody>
+// </table>
 
-</div>";
+// </div>";
 
+// foreach ($numberParticipation as $key => $value) {
+//     echo ($key < 10 ? "0{$key}" : $key) . " : " . (($value * 100) / $numGames) . "%<br>";
+// }
+
+// var_dump($numberParticipation);
+
+echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=<br>";
 foreach ($games as $game) {
     sort($game);
     $game = implode('-', $game);
