@@ -1,150 +1,189 @@
 <?php
+// Define o número de jogos, o número de elementos por jogo e o intervalo dos números
+// NUM_GAMES = 10;          // Quantidade de jogos
+// NUM_ELEMENTS = 15;      // Quantidade de números únicos por jogo
+// MIN_VALUE = 1;          // Valor mínimo
+// MAX_VALUE = 25;         // Valor máximo
+// MAX_PARTICIPATION = 30;
 
-$numGames = 10;          // Quantidade de jogos
-$numElements = 15;      // Quantidade de números únicos por jogo
-$minValue = 1;          // Valor mínimo
-$maxValue = 25;         // Valor máximo
-$maximumPercentageParticipation = 60; // % máxima que um número pode ter participação
+define("NUM_GAMES", 48);
+define("NUM_ELEMENTS", 6);
+define("MIN_VALUE", 1);
+define("MAX_VALUE", 60);
+define("MAX_PARTICIPATION", 12);
 
-$listNumber = range($minValue, $maxValue);
-$games = array(); // Array para armazenar os jogos
-$numberParticipation = array_fill($minValue, $maxValue, 0); // Contador de participação de cada número
 
-$count = 0;
+// Função para gerar um array de números únicos
+function generateUniqueNumbers($numElements, $minValue, $maxValue)
+{
+    $allNumbers = range($minValue, $maxValue);
+    shuffle($allNumbers);
+    return array_slice($allNumbers, 0, $numElements);
+}
 
-while ($count < $numGames) {
-    $count++;
+// Cria o array de jogos
+$games = array();
+for ($i = 0; $i < NUM_GAMES; $i++) {
+    $gameNumbers = generateUniqueNumbers(NUM_ELEMENTS, MIN_VALUE, MAX_VALUE);
+    sort($gameNumbers);
+    $games[] = $gameNumbers;
+}
 
-    $game = array();
-    while (count($game) < $numElements) {
-        // Escolher um número aleatório dentro do intervalo
-        $randomNumber = rand($minValue, $maxValue);
+// Função para calcular a porcentagem de participação de cada número
+function calculateParticipationPercentage($games)
+{
+    $totalGames = count($games);
+    $frequency = array_fill(MIN_VALUE, MAX_VALUE, 0); // Frequência de cada número (1 a 25)
 
-        // Verificar se o número já está no jogo e se sua participação está dentro do limite
-        if (!in_array($randomNumber, $game)) {
-            $game[] = ($randomNumber < 10 ? $randomNumber : $randomNumber);
-            $numberParticipation[$randomNumber]++; // Aumenta a contagem de participação do número
+    // Contar a frequência de cada número
+    foreach ($games as $game) {
+        foreach ($game as $number) {
+            $frequency[$number]++;
         }
     }
 
-    // sort($game);
-    // $game = implode('-', $game);
+    // Calcular a porcentagem de participação
+    $participation = array();
+    foreach ($frequency as $number => $count) {
+        $participation[$number] = ($count / $totalGames) * 100;
+    }
 
-    // Adicionar o jogo à lista de jogos
-    $games[] = $game;
+    return $participation;
 }
 
 
-sort($games);
+function substituirValor(array $array, $valorAntigo, $valorNovo)
+{
+    // Itera sobre o array
+    foreach ($array as $chave => $valor) {
+        // Verifica se o valor atual é igual ao valor a ser substituído
+        if ($valor === $valorAntigo) {
+            // Substitui o valor antigo pelo valor novo
+            $array[$chave] = $valorNovo;
+            // var_dump(['array: ', $array]);
+        }
+    }
+    // Retorna o array modificado
+    return $array;
+}
+
+
+// Calcular a porcentagem de participação
+$participation = calculateParticipationPercentage($games);
+
+
+// Cria o array de jogos | String
+$games_strings = array();
 foreach ($games as $game) {
-    sort($game);
-    $game = implode('-', $game);
-    var_dump($game);
+    $games_strings[] = implode('-', $game);
 }
 
+sort($games_strings);
 
-// Exibir os jogos gerados
+echo "<h2>Jogos</h2>";
+$counter = 1;
+foreach ($games_strings as $string) {
+    echo "#" . $counter++ . ": {$string}<br>";
+}
+
+// Exibir a porcentagem ajustada de participação
+echo "<h2>Porcentagem de Participação | Inicial</h2>";
+asort($participation);
+foreach ($participation as $number => $percentage) {
+    echo "<div " . ($percentage >= MAX_PARTICIPATION ? "style='color: red;'" : '') . ">Número: $number - " . number_format($percentage, 1) . "%</div>";
+}
+
+// Refazer jogos | Ajustar a Participação dos números
+asort($participation);
 // var_dump($games);
+for ($i = 0; $i < count($games); $i++) {
+    $game = $games[$i];
 
-// var_dump($numberParticipation);
-$before = $numberParticipation;
+    for ($j = 0; $j < count($game); $j++) {
+        $number = $game[$j];
+        $alterado = false;
 
-$minParticipation = array_search(min($numberParticipation), $numberParticipation);
-$maxParticipation = array_search(max($numberParticipation), $numberParticipation);
+        if ($participation[$number] >= MAX_PARTICIPATION) {
 
-echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=<br>";
-$teste = 0;
-$newGames = array();
+            // $maiorValor = max($participation);
+            // $key = array_search($maiorValor, $participation);
 
-while (
-    ((($numberParticipation[$minParticipation] * 100) / $numGames) < $maximumPercentageParticipation
-        &&
-        (($numberParticipation[$maxParticipation] * 100) / $numGames) > $maximumPercentageParticipation)
-    && $teste < 3
-) {
-    
-    $teste++;
-    
-    foreach ($games as $keyGame => $game) {
+            // arsort($participation);
 
-        if (
-            (($numberParticipation[$minParticipation] * 100) / $numGames) < $maximumPercentageParticipation
-            &&
-            (($numberParticipation[$maxParticipation] * 100) / $numGames) > $maximumPercentageParticipation
-        ) {
-            
-            // Encontra a chave (índice) da primeira ocorrência de $maxParticipation no array $game
-            $key = array_search($maxParticipation, $game);
+            // if (!in_array($key, $game)) {
+            //     $game = substituirValor($game, $number, $key);
+
+            //     $games[$i] = $game;
+            //     sort($games[$i]);
+            //     $alterado = true;
+            // }
 
 
-            // Se $maxParticipation foi encontrado, substitui pelo $minParticipation
-            if ($key !== false && !in_array($key, $game)) {
-                $game[$key] = $minParticipation;
-                // var_dump("{$key} => {$minParticipation}");
+            for ($k = 0; $k < count($participation); $k++) {
+
+                $key = array_keys($participation)[$k];
+
+                if (!in_array($key, $game)) {
+                    // echo "====================================================<br>";
+                    // var_dump($games[$i]);
+
+                    // Substitui o valor e atualiza o array
+                    echo "{$number} => {$key}<br>";
+                    $game = substituirValor($game, $number, $key);
+
+                    $games[$i] = $game;
+                    sort($games[$i]);
+                    // var_dump($games[$i]);
+                    // echo "====================================================<br>";
+                    $alterado = true;
+                    break;
+                }
             }
-
-            $numberParticipation[$minParticipation]++;
-            $numberParticipation[$maxParticipation]--;
-            
         }
-        
-        $minParticipation = array_search(min($numberParticipation), $numberParticipation);
-        $maxParticipation = array_search(max($numberParticipation), $numberParticipation);
 
-        
+        if ($alterado) {
+            break;
+        }
     }
 
-    $games[$keyGame] = $game;
+    // Atualiza a participação após o loop interno
+    $participation = calculateParticipationPercentage($games);
+    asort($participation);
+
+    // var_dump($participation);
+
 }
 
-// var_dump($numberParticipation);
-$after = $numberParticipation;
+$participation = calculateParticipationPercentage($games);
+asort($participation);
 
 
-echo "<div style='display: flex;'>";
-echo "
-<table>
-    <thead>
-        <tr>
-            <th>before</th>
-            <th>%</th>
-        </tr>
-    
-    </thead>
-    <tbody>";
 
-foreach ($before as $key => $value) {
-    echo "<tr><td>{$key}</td><td>" . round((($value * 100) / $numGames), 2) . "</td></tr>";
+// Exibir a porcentagem ajustada de participação
+echo "<h1>=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=</h1>";
+echo "<h2>Porcentagem de Participação | Ajustada</h2>";
+foreach ($participation as $number => $percentage) {
+    echo "<div " . ($percentage >= MAX_PARTICIPATION ? "style='color: red;'" : '') . ">Número: $number - " . number_format($percentage, 1) . "%</div>";
 }
 
-echo "
-    </tbody>
-</table>";
 
-
-echo "
-<table style='margin-left: 30px;'>
-    <thead>
-        <tr>
-            <th>before</th>
-            <th>%</th>
-        </tr>
-    
-    </thead>
-    <tbody>";
-
-foreach ($after as $key => $value) {
-    echo "<tr><td>{$key}</td><td>" . round((($value * 100) / $numGames), 2) . "</td></tr>";
-}
-
-echo "
-    </tbody>
-</table>
-
-</div>";
-
+// Cria o array de jogos | String
+$games_strings = array();
 foreach ($games as $game) {
-    sort($game);
-    $game = implode('-', $game);
-    var_dump($game);
+
+    foreach ($game as $key => $value) {
+        $game[$key] = ($value < 10 ? "0{$value}" : $value);
+    }
+
+    $games_strings[] = implode('-', $game);
+}
+
+sort($games_strings);
+
+echo "<h2>Jogos | aJUSTADOS</h2>";
+$counter = 1;
+foreach ($games_strings as $string) {
+    echo "#" . ($counter < 10 ? "0{$counter}" : $counter) . ": {$string}<br>";
+
+    $counter++;
 }
